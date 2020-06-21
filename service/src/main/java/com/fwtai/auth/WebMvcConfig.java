@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer{
 
-    /*@Override
+    @Override
     public void addCorsMappings(final CorsRegistry registry){
         registry.addMapping("/**")
             .allowedOrigins("*")
@@ -27,16 +27,6 @@ public class WebMvcConfig implements WebMvcConfigurer{
             .exposedHeaders("access-control-allow-headers","access-control-allow-methods","access-control-allow-origin","access-control-max-age","X-Frame-Options")
             .allowCredentials(true)
             .maxAge(3600l);
-    }*/
-
-    @Override
-    public void addCorsMappings(final CorsRegistry registry) {
-        registry.addMapping("/**")
-            .allowedOrigins("*")
-            .allowCredentials(true)
-            .allowedMethods("*")
-            .allowedHeaders("*")
-            .maxAge(3600L);
     }
 
     /**

@@ -77,7 +77,10 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         //第1步：解决跨域问题。cors 预检请求放行,让Spring security 放行所有preflight request（cors 预检请求|探测）
-        http.authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll();
+
+        //http.cors().and().csrf().disable().authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll();
+
+        http.authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll();//处理跨域请求中的Preflight请求
         //第2步：让Security永远不会创建HttpSession，它不会使用HttpSession来获取SecurityContext
         //http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().headers().cacheControl();
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -97,15 +100,10 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
         //第7步：登录(如果报错则使用下面的那个)
         http.formLogin()
-            .failureForwardUrl(ConfigFile.URL_LOGIN_PAGE)
-            .loginPage(ConfigFile.URL_LOGIN_PAGE)
             .loginProcessingUrl(ConfigFile.URL_PROCESSING)
             .usernameParameter("username")
             .passwordParameter("password")
             .permitAll();//放开登录相关的url
-
-        //第7步：登录,因为使用前端发送JSON方式进行登录，所以登录模式不设置也是可以的。
-        //http.formLogin();
 
         //第8步：退出
         http.logout().addLogoutHandler(logoutService).logoutSuccessHandler(logoutSuccessService);

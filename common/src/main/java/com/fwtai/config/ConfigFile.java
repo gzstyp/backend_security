@@ -22,7 +22,7 @@ public final class ConfigFile implements Serializable{
 
     public final static String URL_PROCESSING = "/login";//登录认证接口,security默认的接口
 
-    public final static String[] IGNORE_URLS = {"/","/error",URL_LOGIN_PAGE,URL_REGISTER,URL_PROCESSING,"/user/logout","/bootstrap/**","/*.ico","/css/**","/images/**","/js/**","/webjars/**","/swagger/**","/v2/api-docs","/swagger-ui.html","/swagger-resources/**","/v1.0/**","/v2/**","/images/**","/avatars/**","/fonts/**","/img/**"};
+    public final static String[] IGNORE_URLS = {"/","/error",URL_LOGIN_PAGE,URL_REGISTER,URL_PROCESSING,"/user/renewalToken","/user/logout","/bootstrap/**","/*.ico","/css/**","/images/**","/js/**","/webjars/**","/swagger/**","/v2/api-docs","/swagger-ui.html","/swagger-resources/**","/v1.0/**","/v2/**","/images/**","/avatars/**","/fonts/**","/img/**"};
 
     public final static String ACCESS_TOKEN = "access_token";
 

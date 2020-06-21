@@ -41,7 +41,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
         final String refresh_token = toolToken.expireRefreshToken(userId);
         final String access_token = toolToken.expireAccessToken(userId);
         //加载前端菜单
-        final Map<String,Object> map = new HashMap<>(3);
+        final Map<String,Object> map = new HashMap<>(4);
         map.put(ConfigFile.REFRESH_TOKEN,refresh_token);
         map.put(ConfigFile.ACCESS_TOKEN,access_token);
         map.put("menuData",menuService.getMenuData(userId));

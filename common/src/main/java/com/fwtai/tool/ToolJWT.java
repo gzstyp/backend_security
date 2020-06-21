@@ -35,10 +35,10 @@ import java.util.function.Function;
 public class ToolJWT implements Serializable{
 
     //如设置Token过期时间15分钟，建议更换时间设置为Token前5分钟,通过try catch 获取过期
-    private final long access_token = 1000 * 60 * 15;//当 refresh_token 已过期了，再判断 access_token 是否已过期,
+    private final long access_token = 1000 * 60 * 45;//当 refresh_token 已过期了，再判断 access_token 是否已过期,
 
     /**一般更换新的access_token小于5分钟则提示需要更换新的access_token*/
-    private final long refresh_token = 1000 * 60 * 10;//仅做token的是否需要更换新的access_token标识,小于5分钟则提示需要更换新的access_token
+    private final long refresh_token = 1000 * 60 * 40;//仅做token的是否需要更换新的access_token标识,小于5分钟则提示需要更换新的access_token
 
     private String issuer = "贵州富翁泰科技有限责任公司";//jwt签发者
 

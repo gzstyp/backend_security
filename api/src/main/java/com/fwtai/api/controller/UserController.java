@@ -5,7 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,8 +42,14 @@ public class UserController{
         @ApiImplicitParam(name = "password", value = "登录密码", dataType = "String", paramType = "query", required = true),
         @ApiImplicitParam(name = "type", value = "登录类型1 为android ; 2 ios;", dataType = "int", example = "1",paramType = "query", required = true),
     })
-    @GetMapping("login")
+    @PostMapping("login")
     public void login(final HttpServletResponse response){
         ToolClient.responseJson(ToolClient.createJsonSuccess("操作成功"),response);
+    }
+
+    //放行对外提供注册接口url
+    @PostMapping(value = "/register")
+    public void register(final HttpServletResponse response){
+        ToolClient.responseJson(ToolClient.createJsonSuccess("post的register,无token"),response);
     }
 }

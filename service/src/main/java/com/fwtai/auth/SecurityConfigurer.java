@@ -77,16 +77,15 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         //第1步：解决跨域问题。cors 预检请求放行,让Spring security 放行所有preflight request（cors 预检请求|探测）
-
-        //http.cors().and().csrf().disable().authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll();
-
         http.authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll();//处理跨域请求中的Preflight请求
+
         //第2步：让Security永远不会创建HttpSession，它不会使用HttpSession来获取SecurityContext
+
         //http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().headers().cacheControl();
-        http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().headers().cacheControl();//http.cors()解决跨域问题
+
         //第3步：请求权限配置,放行注册API请求，其它任何请求都必须经过身份验证.
-        http.authorizeRequests().antMatchers(HttpMethod.POST,ConfigFile.URL_REGISTER).permitAll()//注意还有请求方式
-        .anyRequest().authenticated();//不走动态加载权限的处理
+        http.authorizeRequests().antMatchers(HttpMethod.POST,ConfigFile.URL_REGISTER).permitAll().anyRequest().authenticated();//注意还有请求方式,不走动态加载权限的处理
 
         //第4步：拦截账号、密码。覆盖 UsernamePasswordAuthenticationFilter过滤器
         http.addFilterAt(myUsernamePasswordAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class);
@@ -99,11 +98,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         http.exceptionHandling().authenticationEntryPoint(authenticationPointHandler).accessDeniedHandler(accessDeniedService);
 
         //第7步：登录(如果报错则使用下面的那个)
-        http.formLogin()
-            .loginProcessingUrl(ConfigFile.URL_PROCESSING)
-            .usernameParameter("username")
-            .passwordParameter("password")
-            .permitAll();//放开登录相关的url
+        http.formLogin().loginProcessingUrl(ConfigFile.URL_PROCESSING).usernameParameter("username").passwordParameter("password").permitAll();//放开登录相关的url
 
         //第8步：退出
         http.logout().addLogoutHandler(logoutService).logoutSuccessHandler(logoutSuccessService);

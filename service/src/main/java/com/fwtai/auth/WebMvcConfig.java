@@ -29,11 +29,10 @@ public class WebMvcConfig implements WebMvcConfigurer{
     @Override
     public void addCorsMappings(final CorsRegistry registry){
         registry.addMapping("/**")
-            .allowedOrigins("*")
+            .allowedOrigins("*")//同源配置，*表示任何请求都视为同源，若需指定ip和端口可以改为如“localhost：8080”，多个以“,”分隔；
             .allowedMethods("PUT","DELETE","GET","POST","OPTIONS")
             .allowedHeaders("*")
-            .exposedHeaders("access-control-allow-headers","access-control-allow-methods","access-control-allow-origin","access-control-max-age","X-Frame-Options")
             .allowCredentials(true)
-            .maxAge(7200l);
+            .maxAge(7200l);//默认值是 1800 seconds (即30分钟)
     }
 }

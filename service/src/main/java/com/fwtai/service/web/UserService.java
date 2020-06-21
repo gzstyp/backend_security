@@ -10,14 +10,11 @@ import com.fwtai.entity.User;
 import com.fwtai.service.AsyncService;
 import com.fwtai.tool.ToolClient;
 import com.fwtai.tool.ToolJWT;
-import com.fwtai.tool.ToolSHA;
 import com.fwtai.tool.ToolString;
-import org.mybatis.spring.MyBatisSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

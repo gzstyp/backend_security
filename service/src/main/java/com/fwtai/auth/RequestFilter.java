@@ -2,6 +2,7 @@ package com.fwtai.auth;
 
 import com.fwtai.config.ConfigFile;
 import com.fwtai.config.FlagToken;
+import com.fwtai.config.LocalUserId;
 import com.fwtai.config.RenewalToken;
 import com.fwtai.service.UserServiceDetails;
 import com.fwtai.tool.ToolJWT;
@@ -42,7 +43,8 @@ public class RequestFilter extends OncePerRequestFilter {
         for(int x = 0; x < urls.length; x++){
             final String url = urls[x];
             if(uri.equals(url)){
-                chain.doFilter(request, response);
+                //response.setHeader("Access-Control-Allow-Origin","*");//登录时报错这个,是因为把登录的url添加到放行的url导致的
+                chain.doFilter(request,response);
                 return;
             }
         }
@@ -82,6 +84,7 @@ public class RequestFilter extends OncePerRequestFilter {
                 final String userId = toolToken.extractUserId(access);
                 //判断用户不为空，且SecurityContextHolder授权信息还是空的
                 final SecurityContext context = SecurityContextHolder.getContext();
+                LocalUserId.set(userId);
                 if (userId != null && context.getAuthentication() == null) {
                     //通过用户信息得到UserDetails
                     final UserDetails userDetails = userDetailsService.getUserById(userId);

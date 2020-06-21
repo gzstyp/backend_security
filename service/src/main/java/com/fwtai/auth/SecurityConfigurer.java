@@ -82,7 +82,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         //第2步：让Security永远不会创建HttpSession，它不会使用HttpSession来获取SecurityContext
 
         //http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().headers().cacheControl();
-        http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().headers().cacheControl();//http.cors()解决跨域问题
+        http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//http.cors()解决跨域问题
 
         //第3步：请求权限配置,放行注册API请求，其它任何请求都必须经过身份验证.
         http.authorizeRequests().antMatchers(HttpMethod.POST,ConfigFile.URL_REGISTER).permitAll().anyRequest().authenticated();//注意还有请求方式,不走动态加载权限的处理

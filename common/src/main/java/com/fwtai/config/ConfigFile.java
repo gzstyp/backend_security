@@ -13,12 +13,9 @@ import java.io.Serializable;
 */
 public final class ConfigFile implements Serializable{
 
-    /**token请求头名称*/
-    //public final static String TOKEN_HEADER_NAME = "authorization";
-
     public final static String URL_LOGIN_PAGE = "/login.html";//登录页面
 
-    public final static String URL_REGISTER = "/user/register";//注册添加接口
+    public final static String URL_REGISTER = "/user/register";//放行对外提供注册接口url
 
     public final static String URL_PROCESSING = "/login";//登录认证接口,security默认的接口
 

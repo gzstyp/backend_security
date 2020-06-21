@@ -20,7 +20,7 @@ public class AuthenticationPointHandler implements AuthenticationEntryPoint{
 
     @Override
     public void commence(final HttpServletRequest request,final HttpServletResponse response,final AuthenticationException exception) throws IOException, ServletException{
-        final Integer flag = FlagToken.get();
+        final Integer flag = FlagToken.get();//值若为空说明是未带token且未放行的url而请求导致的
         System.out.println("flag-->"+flag);
         String json = ToolClient.notAuthorized();
         if(flag != null){
@@ -41,9 +41,6 @@ public class AuthenticationPointHandler implements AuthenticationEntryPoint{
             }
         }
         System.out.println("++++++++++++++"+exception.getMessage()+"++++++++++++++");
-        if(flag == null){
-            json = ToolClient.tokenInvalid();
-        }
         ToolClient.responseJson(json,response);
         // todo 处理 ThreadLocal
     }

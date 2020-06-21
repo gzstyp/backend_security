@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sys_user">
+
+    <!-- 登录认证 -->
+    <select id="login" resultType="String" parameterType="String">
+        SELECT user_password FROM VIEW_USER_LOGIN WHERE USER_NAME = #{username} LIMIT 1
+    </select>
+
+    <select id="getUserByUserName" resultType="com.fwtai.bean.SysUser" parameterType="String">
+        SELECT kid,user_name, user_password,enabled FROM VIEW_USER_LOGIN WHERE USER_NAME = #{username} LIMIT 1
+    </select>
+
+    <select id="getUserById" resultType="com.fwtai.bean.SysUser" parameterType="String">
+        SELECT kid,user_name, user_password,enabled FROM VIEW_USER_LOGIN WHERE kid = #{userId} LIMIT 1
+    </select>
+
+    <!-- 用户的全部角色和权限(含角色、用户菜单+角色菜单[权限]) -->
+    <select id="getRolePermissions" resultType="String" parameterType="String">
+        select sr.role_flag from sys_user_role sur
+        left join sys_role sr on sr.kid = sur.role_id
+        where sur.user_id = #{userId}
+        union all
+        select sm.permission from (select distinct srm.menu_id from sys_role_menu srm where srm.role_id in (
+        select sr.kid from sys_user_role sur
+        left join sys_role sr on sr.kid = sur.role_id
+        where sur.user_id = #{userId}
+        )
+        union
+        select menu_id from sys_user_menu where user_id = #{userId}) ltb,sys_menu sm where sm.kid = ltb.menu_id
+    </select>
+
+
+    <select id="queryUser" resultType="User" parameterType="String">
+        SELECT error_count,DATE_FORMAT(error_time,'%Y-%m-%d %H:%i:%S') error_time,(NOW() - error_time) error FROM view_user_login WHERE user_name = #{userName} LIMIT 1
+    </select>
+    <!-- 登录-每错误一次就累加叠加1 -->
+    <update id="updateErrors" parameterType="String">
+		UPDATE sys_user SET error_count = error_count + 1 WHERE user_name = #{userName} LIMIT 1
+	</update>
+    <!-- 登录-更新错误时刻 -->
+    <update id="updateLoginTime" parameterType="String">
+		UPDATE sys_user SET error_time = DATE_ADD(NOW(),INTERVAL 30 MINUTE) WHERE user_name = #{userName} LIMIT 1
+	</update>
+    <!-- 登录-最后登录时间 -->
+    <update id="updatelogintime" parameterType="String">
+		UPDATE sys_user SET logintime = NOW() WHERE kid = #{userId} LIMIT 1
+	</update>
+    <!-- 登录-更新登录次数 -->
+    <update id="updateTimes" parameterType="String">
+		UPDATE sys_user SET times = times + 1 WHERE kid = #{userId} LIMIT 1
+	</update>
+    <!-- 登录-登录成功把时间设置为当前默认时间 -->
+    <update id="updateErrorTime" parameterType="String">
+		UPDATE sys_user SET error_time = NOW() WHERE kid = #{userId} LIMIT 1
+	</update>
+    <!-- 登录-登录结束:登录成功把登录错误次数更改为0 -->
+    <update id="updateErrorCount" parameterType="String">
+		UPDATE sys_user SET error_count = 0  WHERE kid = #{userId} LIMIT 1
+	</update>
+
+    <!-- 查询是否存在 -->
+    <select id="queryExistById" resultType="String" parameterType="String">
+        select user_name from sys_user where kid = #{kid} LIMIT 1
+    </select>
+
+    <!-- 查询账号是否存在 -->
+    <select id="queryExistByUser" resultType="String" parameterType="String">
+        select kid from sys_user where user_name = #{userName} LIMIT 1
+    </select>
+
+    <!-- 添加账号 -->
+    <update id="addUser" parameterType="HashMap">
+        INSERT INTO sys_user (kid,user_name) VALUES (#{kid},#{user_name})
+    </update>
+
+    <!-- 添加密码 -->
+    <update id="addPassword" parameterType="HashMap">
+        INSERT INTO sys_user_password (user_id,user_password) VALUES (#{kid},#{password})
+    </update>
+
+    <!-- 编辑密码 -->
+    <update id="editPassword" parameterType="HashMap">
+        update sys_user_password set user_password = #{password} where user_id = #{kid} LIMIT 1
+    </update>
+
+    <!-- 删除-删除账号 -->
+    <update id="delUser" parameterType="String">
+        DELETE FROM SYS_USER WHERE KID = #{kid} LIMIT 1
+    </update>
+
+    <!-- 删除-删除密码 -->
+    <update id="delPassword" parameterType="String">
+        DELETE FROM SYS_USER_PASSWORD WHERE USER_ID = #{kid} LIMIT 1
+    </update>
+
+    <!--删除-删除用户菜单-->
+    <update id="delUserMenu" parameterType="String">
+        DELETE FROM SYS_USER_MENU WHERE USER_ID = #{kid}
+    </update>
+
+    <!--删除-删除用户角色-->
+    <update id="delUserRole" parameterType="String">
+        DELETE FROM SYS_USER_ROLE WHERE USER_ID = #{kid}
+    </update>
+
+    <!-- 批量删除-用户账号 -->
+    <update id="delListUser" parameterType="ArrayList">
+        DELETE FROM SYS_USER WHERE KID IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 批量删除-用户密码 -->
+    <update id="delListPassword" parameterType="ArrayList">
+        DELETE FROM SYS_USER_PASSWORD WHERE USER_ID IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 批量删除-用户菜单 -->
+    <update id="delListUserMenu" parameterType="ArrayList">
+        DELETE FROM SYS_USER_MENU WHERE USER_ID IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 批量删除-用户角色 -->
+    <update id="delListUserRole" parameterType="ArrayList">
+        DELETE FROM SYS_USER_ROLE WHERE USER_ID IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--获取登录者的权限 -->
+    <select id="getPermission" resultType="String" parameterType="String">
+        select permission from (
+        select sur.user_id,sm.permission from sys_user_role sur
+        left join sys_role_menu srm on srm.role_id = sur.role_id
+        inner join sys_menu sm on sm.kid = srm.menu_id
+        union
+        select sum.user_id,sm.permission from sys_user_menu sum
+        left join sys_menu sm on sm.kid = sum.menu_id) tb where user_id = #{userId}
+    </select>
+
+    <!--获取登录者的角色 -->
+    <select id="getRole" resultType="String" parameterType="String">
+        select sr.role_flag from sys_user_role sur
+        left join sys_role sr on sr.kid = sur.role_id
+        where sur.user_id = #{userId}
+    </select>
+
+    <!-- 列表的数据 -->
+    <select id="listData" parameterType="HashMap" resultType="HashMap">
+        select su.kid,su.user_name,su.error_count,DATE_FORMAT(su.add_date,'%Y-%m-%d') add_date,su.enabled,DATE_FORMAT(su.logintime,'%Y-%m-%d %H:%i') logintime
+        from sys_user su
+        <choose>
+            <when test="userId != null and keySuper != null">
+                WHERE su.kid != #{userId} AND su.user_name != 'admin'
+                <if test="user_name != null">
+                    AND su.user_name LIKE CONCAT(#{user_name},'%')
+                </if>
+            </when>
+            <otherwise>
+                <if test="user_name != null">
+                    WHERE su.user_name LIKE CONCAT(#{user_name},'%')
+                </if>
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="order != null and column != null">
+                ORDER BY ${column} ${order}
+            </when>
+            <otherwise>
+                ORDER BY su.add_date
+            </otherwise>
+        </choose>
+        LIMIT #{section},#{pageSize}
+    </select>
+
+    <!-- 列表的总条数|总记录数 -->
+    <select id="listTotal" parameterType="HashMap" resultType="Integer">
+        select COUNT(su.kid) total from sys_user su
+        <choose>
+            <when test="userId != null and keySuper != null">
+                WHERE su.kid != #{userId} AND su.user_name != 'admin'
+                <if test="user_name != null">
+                    AND su.user_name LIKE CONCAT(#{user_name},'%')
+                </if>
+            </when>
+            <otherwise>
+                <if test="user_name != null">
+                    WHERE su.user_name LIKE CONCAT(#{user_name},'%')
+                </if>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 获取角色(根据userId) -->
+    <select id="getUserIdAllotRole" resultType="HashMap" parameterType="String">
+        select sr.kid,sr.role_name,lt.kid checked from sys_role sr
+        left join (
+        select sr.kid from sys_role sr
+        left join sys_user_role sur on sr.kid = sur.role_id
+        where sur.user_id = #{userId}
+        ) lt on lt.kid = sr.kid
+    </select>
+
+    <!-- 获取角色 -->
+    <select id="getAllotRole" resultType="HashMap">
+        select kid,role_name from sys_role
+    </select>
+
+    <!-- 清空角色 -->
+    <update id="delRoleUser" parameterType="String">
+        DELETE FROM SYS_USER_ROLE WHERE USER_ID = #{userId}
+    </update>
+
+    <!-- 重新分配角色 -->
+    <update id="addRoleForUser" parameterType="ArrayList">
+        INSERT INTO SYS_USER_ROLE (kid,role_id,user_id) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (
+            <trim suffixOverrides=",">
+                REPLACE(UUID(),'-',''),
+                <if test="item.role_id != null and item.role_id != ''">#{item.role_id},</if>
+                <if test="item.user_id != null and item.user_id != ''">#{item.user_id}</if>
+            </trim>
+            )
+        </foreach>
+    </update>
+
+    <!-- 批量插入用户角色的保存 -->
+    <update id="saveRoleIds">
+        INSERT INTO SYS_USER_ROLE (kid,role_id,user_id) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (REPLACE(UUID(),'-',''),#{item.role_id},#{item.user_id})
+        </foreach>
+    </update>
+
+    <!-- 启用禁用 -->
+    <update id="editEnabled" parameterType="HashMap">
+        update sys_user set enabled = #{disable} where kid = #{userId} and enabled = #{enabled} LIMIT 1
+    </update>
+
+    <!-- 根据当前登录人的获取菜单,用于ztree的菜单分配,用于异步加载,目前还没有用到 -->
+    <select id="get_own_menu" resultType="HashMap" parameterType="HashMap">
+        select kid,name,IF(subId IS NOT NULL OR isParent = 1,1,0) isParent,IF(lt.menu_id is not null,1,0) checked
+        from (select sm.kid,sm.name,sm.subset isParent,sub.pid subId,sm.pid,sm.order_by from sys_menu sm
+        left join (select pid from sys_menu group by pid) sub on sub.pid = sm.kid) tb
+        left join (select menu_id from sys_user_menu where user_id = #{userId}) lt on lt.menu_id = tb.kid where tb.pid = #{pid} ORDER BY order_by
+    </select>
+
+    <!-- 根据指定userId的获取菜单,用于ztree的菜单分配 -->
+    <select id="getOwnMenu" resultType="HashMap" parameterType="String">
+        select kid,pid,name,IF(lt.menu_id is not null,'true','false') checked
+        from (select sm.kid,sm.name,sm.pid,sm.order_by from sys_menu sm
+        left join (select pid from sys_menu group by pid) sub on sub.pid = sm.kid) tb
+        left join (select menu_id from sys_user_menu where user_id = #{userId}) lt on lt.menu_id = tb.kid
+        ORDER BY order_by
+    </select>
+
+    <!--查看指定userid所有的权限菜单数据-->
+    <select id="getMenuData" resultType="HashMap" parameterType="String">
+        select lt.kid,lt.name,IF(lt.subset = 1 or sub.pid is not null,1,0) isParent,lt.pid from
+        (select sm.kid,sm.name,sm.subset,sm.order_by,sm.pid from sys_menu sm,(select menu_id from sys_user_menu where user_id = #{userId}
+        union
+        select menu_id from sys_role_menu where role_id in (select role_id from sys_user_role where user_id = #{userId})
+        ) lb
+        where sm.kid = lb.menu_id) lt
+        left join (select sm.pid from sys_menu sm,(
+        select menu_id from sys_user_menu where user_id = #{userId}
+        union
+        select menu_id from sys_role_menu where role_id in (select role_id from sys_user_role where user_id = #{userId})
+        ) lb
+        where sm.kid = lb.menu_id group by sm.pid) sub on sub.pid = lt.kid order by order_by ASC
+    </select>
+
+    <!-- 保存用户的私有菜单 -->
+    <update id="saveOwnMenu">
+        INSERT INTO SYS_USER_MENU (kid,menu_id,user_id) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (REPLACE(UUID(),'-',''),#{item.menu_id},#{item.user_id})
+        </foreach>
+    </update>
+
+    <!-- 控制页面的按钮是否显示(页面按钮默认是显示)获取当前登录id的按钮权限(full outer join) -->
+    <select id="permissionsShow" resultType="String" parameterType="HashMap">
+        SELECT LT.PERMISSION FROM (SELECT SM.PID,SM.PERMISSION FROM (SELECT SRM.MENU_ID FROM SYS_USER_ROLE SUR
+        LEFT JOIN SYS_ROLE_MENU SRM ON SRM.ROLE_ID = SUR.ROLE_ID
+        WHERE SUR.USER_ID = #{userId}
+        UNION
+        SELECT MENU_ID FROM SYS_USER_MENU SUM WHERE USER_ID = #{userId}) LT
+        RIGHT JOIN SYS_MENU SM ON LT.MENU_ID = SM.KID WHERE LT.MENU_ID IS NULL)LT
+        LEFT JOIN SYS_MENU SM ON SM.PID = LT.PID WHERE SM.URL = #{url}
+    </select>
+
+    <!-- 控制页面的按钮是否显示(页面按钮默认是隐藏)获取当前登录id的按钮权限 -->
+    <select id="permissions" resultType="String" parameterType="HashMap">
+         SELECT LT.PERMISSION FROM (SELECT SM.PID,SM.PERMISSION
+        FROM (
+        SELECT SRM.MENU_ID FROM SYS_USER_ROLE SUR
+        LEFT JOIN SYS_ROLE_MENU SRM ON SRM.ROLE_ID = SUR.ROLE_ID
+        WHERE SUR.USER_ID = #{userId}
+        UNION
+        SELECT MENU_ID FROM SYS_USER_MENU SUM WHERE USER_ID = #{userId})LT,SYS_MENU SM WHERE LT.MENU_ID = SM.KID
+        ) LT,SYS_MENU SM WHERE SM.PID = LT.PID AND SM.URL = #{url}
+    </select>
+</mapper>

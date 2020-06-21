@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sys_menu">
+
+    <!-- 添加或编辑时查询权限是否已存在 -->
+    <select id="queryPermissionExist" resultType="String" parameterType="String">
+        select kid from sys_menu where permission = #{permission} LIMIT 1
+    </select>
+
+    <!-- 添加或编辑时查询url是否已存在 -->
+    <select id="queryUrlExist" resultType="String" parameterType="String">
+        select kid from sys_menu where url = #{url} LIMIT 1
+    </select>
+
+    <!-- 获取菜单层次关系|根据id查询菜单层次级别关系 -->
+    <select id="getRelation" resultType="String" parameterType="String">
+        SELECT RELATION FROM SYS_MENU WHERE KID = #{pid} LIMIT 1
+    </select>
+
+    <!-- 查询所删除的菜单数据是否还有子页面或普通按钮或行内按钮在使用 -->
+    <select id="queryUseTotal" resultType="String" parameterType="String">
+        select kid from sys_menu where pid = #{kid} LIMIT 1
+    </select>
+
+    <!-- 查询所删除的菜单数据是否已分配到角色菜单,没有用到本sql -->
+    <select id="queryUseRoleMenu" resultType="Integer" parameterType="String">
+        select count(role_id) total from sys_role_menu where menu_id = #{kid} LIMIT 1
+    </select>
+
+    <!-- 查询所删除的菜单数据是否已分配用户菜单,没有用到本sql -->
+    <select id="queryUseUserMenu" resultType="Integer" parameterType="String">
+        select count(user_id) total from sys_user_menu where menu_id = #{kid} LIMIT 1
+    </select>
+
+    <!-- 查询是否还有以普通按钮或行内按钮作为父级菜单 -->
+    <select id="queryPidExistChid" resultType="String" parameterType="String">
+        select kid from sys_menu where pid = #{pid} and type = 1 LIMIT 1
+    </select>
+
+    <!-- 删除菜单时-删除与该id相关联的角色菜单表; -->
+    <delete id="del_menu_role" parameterType="String">
+		delete from sys_role_menu where menu_id = #{kid}
+	</delete>
+
+    <!-- 删除菜单时-删除与该id相关联的账号私有菜单表; -->
+    <delete id="del_menu_account" parameterType="String">
+		delete from sys_user_menu where menu_id = #{kid}
+	</delete>
+
+    <!-- 删除-单行 -->
+    <update id="delById" parameterType="String">
+        delete from sys_menu where kid = #{kid} LIMIT 1
+    </update>
+
+    <!-- 查询详细数据 -->
+    <select id="queryById" resultType="HashMap" parameterType="String">
+        select sub.pid subId,sm.name,s.name pName,sm.subset,sm.pid,sm.permission,sm.category,sm.icon_style,sm.url,sm.type,sm.order_by from sys_menu sm
+        left join sys_menu s on s.kid = sm.pid
+        left join (select pid from sys_menu where type = 1 group by pid) sub on sub.pid = sm.kid
+        where sm.kid = #{kid} LIMIT 1
+    </select>
+
+    <!-- 添加数据 -->
+    <update id="add" parameterType="HashMap">
+        INSERT IGNORE INTO SYS_MENU (
+        <trim suffixOverrides=",">
+            <if test="kid != null">kid,</if>
+            <if test="name != null">name,</if>
+            <if test="permission != null">permission,</if>
+            <if test="category != null">category,</if>
+            <if test="icon_style != null">icon_style,</if>
+            <if test="pid != null">pid,</if>
+            <if test="url != null">url,</if>
+            <if test="subset != null">subset,</if>
+            <if test="type != null">type,</if>
+            <if test="relation != null">relation,</if>
+            <if test="order_by != null">order_by</if>
+        </trim>
+        ) VALUES (
+        <trim suffixOverrides=",">
+            <if test="kid != null">#{kid},</if>
+            <if test="name != null">#{name},</if>
+            <if test="permission != null">#{permission},</if>
+            <if test="category != null">#{category},</if>
+            <if test="icon_style != null">#{icon_style},</if>
+            <if test="pid != null">#{pid},</if>
+            <if test="url != null">#{url},</if>
+            <if test="subset != null">#{subset},</if>
+            <if test="type != null">#{type},</if>
+            <if test="relation != null">#{relation},</if>
+            <if test="order_by != null">#{order_by}</if>
+        </trim>
+        )
+    </update>
+    
+    <!-- 编辑数据 -->
+    <update id="edit" parameterType="HashMap">
+        UPDATE SYS_MENU
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="permission != null">permission = #{permission},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="icon_style != null">icon_style = #{icon_style},</if>
+            <if test="pid != null">pid = #{pid},</if>
+            <if test="url != null">url = #{url},</if>
+            <if test="subset != null">subset = #{subset},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="order_by != null">order_by = #{order_by},</if>
+            <if test="relation != null">relation = #{relation}</if>
+        </trim>
+        WHERE kid = #{kid} LIMIT 1
+    </update>
+
+    <!--获取当前登录人的所拥有的菜单-->
+    <select id="getMenus" resultType="Menu" parameterType="String">
+        SELECT kid,name,pid,url,icon_style,subset FROM SYS_MENU SM,
+        (SELECT MENU_ID FROM SYS_USER_MENU WHERE USER_ID = #{userId}
+        UNION
+        SELECT MENU_ID FROM SYS_ROLE_MENU WHERE ROLE_ID IN (SELECT ROLE_ID FROM SYS_USER_ROLE WHERE USER_ID = #{userId})
+        ) TB WHERE SM.KID = TB.MENU_ID AND TYPE = 1 ORDER BY ORDER_BY
+    </select>
+
+    <!-- 列表的数据 -->
+    <select id="listData" parameterType="HashMap" resultType="HashMap">
+        select sm.kid,sm.name,s.name pName,sm.permission,sm.category,sm.icon_style,sm.url,sm.type from sys_menu sm
+        left join sys_menu s on s.kid = sm.pid
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="name != null">
+                AND sm.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="pName != null">
+                AND s.name LIKE CONCAT('%',#{pName},'%')
+            </if>
+            <if test="type != null">
+                AND sm.TYPE = #{type}
+            </if>
+        </trim>
+        <choose>
+            <when test="order != null and column != null">
+                ORDER BY ${column} ${order}
+            </when>
+            <otherwise>
+                ORDER BY sm.order_by
+            </otherwise>
+        </choose>
+        LIMIT #{section},#{pageSize}
+    </select>
+
+    <!-- 列表的总条数|总记录数 -->
+    <select id="listTotal" parameterType="HashMap" resultType="Integer">
+        select COUNT(sm.kid)total from sys_menu sm
+        left join sys_menu s on s.kid = sm.pid
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="name != null">
+                AND sm.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="pName != null">
+                AND s.name LIKE CONCAT('%',#{pName},'%')
+            </if>
+            <if test="type != null">
+                AND sm.TYPE = #{type}
+            </if>
+        </trim>
+    </select>
+
+    <!-- 查询所有的菜单,用于菜单的添加或编辑 -->
+    <select id="queryAllMenu" parameterType="String" resultType="HashMap">
+		SELECT kid,name,subset isParent,url uri FROM sys_menu WHERE pid = #{kid} AND type = 1 ORDER BY ORDER_BY
+	</select>
+
+    <!--根据当前登录者的userId查询页面的权限按钮-->
+    <select id="queryPermissionByUserId" resultType="HashMap" parameterType="HashMap">
+        select tbl.permission dom,tbr.permission exist from (select sm.permission from sys_menu sm where pid = #{pid}) tbl
+        left join (
+            select tb.permission from (
+                select sur.user_id,sm.permission,sm.pid from sys_user_role sur
+                left join sys_role_menu srm on srm.role_id = sur.role_id
+                inner join sys_menu sm on sm.kid = srm.menu_id
+                union
+                select sum.user_id,sm.permission,sm.pid from sys_user_menu sum
+                left join sys_menu sm on sm.kid = sum.menu_id) tb where tb.user_id = #{userId} and tb.pid = #{pid}) tbr
+        on tbl.permission = tbr.permission
+    </select>
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.fwtai</groupId>
+    <artifactId>backend_security</artifactId>
+    <packaging>pom</packaging>
+    <version>v1.0.0</version>
+    <url>http://www.yinlz.com</url>
+    <description>
+        spring boot 2.3.x + spring security 构建模块化后端开发
+        基于spring boot 2.x.x构建模块化开发,支持SqlSessionTemplate和mapper
+        如果打包出错(可能是死循环依赖或相互依赖导致),先注解可打包的子模块的build节点,其子模块打包步骤:
+        １.先注释掉子模块web模块里的pom.xml里的build节点;
+        ２.双击父模块admin_jsp里maven快捷键的install,不推荐双击package打包,因为可能打包后jar会很大;
+        ３.另外,web 、api等模块需要在单独的模块里打包jar才不被叠加jar文件才小;
+        ４.只打包web或api即可实现前后端分离;
+        ５.如果不想前后端分离则打包模块frontend,但务必要注释模块web模块里的pom.xml里的build节点;
+        ６.每次修改代码都要父模块install一下
+        ７.注意 application.properties 的文件读取,是以最终打包的模块的文件为主,否则是获取不到数据的问题：
+        比如本项目就只有把配置文件放在api、web、frontend模块里的值才能获取到,否则会报错获取不到值;
+        注意service层的方法上是否有final关键字,否则也会这个报错,或提示系统出现错误(其实是空指针)
+    </description>
+    <modules>
+        <module>api</module>
+        <module>bean</module>
+        <module>common</module>
+        <module>dao</module>
+        <module>web</module>
+        <module>service</module>
+        <module>swagger</module>
+    </modules>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.0.RELEASE</version>
+        <relativePath/>
+    </parent>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>1.8</java.version>
+    </properties>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                        <target>1.8</target>
+                        <source>1.8</source>
+                    </configuration>
+                </plugin>
+                <!--打包时跳过测试-->
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.1</version>
+                    <configuration>
+                        <skipTests>true</skipTests>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.7.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <!-- 忽略无web.xml警告 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.2.2</version>
+                    <configuration>
+                        <failOnMissingWebXml>false</failOnMissingWebXml>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

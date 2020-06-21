@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sys_role">
+
+    <!--添加或编辑时查询角色名称是否已存在,查询得到的kid是否存在或和本次修改的id是否一致来判断是否存在-->
+    <select id="queryRoleName" resultType="String" parameterType="String">
+        select kid from sys_role where role_name = #{roleName} LIMIT 1
+    </select>
+
+    <!--添加或编辑时查询角色标识是否已存在,查询得到的kid是否存在或和本次修改的id是否一致来判断是否存在-->
+    <select id="queryRoleFlag" resultType="String" parameterType="String">
+        select kid from sys_role where role_flag = #{roleFlag} LIMIT 1
+    </select>
+
+    <select id="queryExistById" resultType="String" parameterType="String">
+        select kid from sys_role where kid = #{kid} LIMIT 1
+    </select>
+
+    <!-- 添加 -->
+    <update id="add" parameterType="HashMap">
+        INSERT INTO sys_role (kid,role_name,role_flag) VALUES (#{kid},#{role_name},#{role_flag})
+    </update>
+
+    <!-- 编辑 -->
+    <update id="edit" parameterType="HashMap">
+        UPDATE sys_role SET role_name = #{role_name},role_flag = #{role_flag} WHERE kid = #{kid} LIMIT 1
+    </update>
+
+    <!-- 删除,单条 -->
+    <update id="del" parameterType="String">
+        DELETE FROM SYS_ROLE WHERE KID = #{kid} LIMIT 1
+    </update>
+
+    <!-- 角色列表的数据 -->
+    <select id="listData" parameterType="HashMap" resultType="HashMap">
+        SELECT sr.kid,sr.role_name,sr.role_flag,l_tb.utotal,lt_rm.mtotal FROM sys_role sr
+        LEFT JOIN (SELECT COUNT(role_id) utotal,role_id FROM sys_user_role GROUP BY role_id) l_tb ON l_tb.role_id = sr.kid
+        LEFT JOIN (SELECT role_id,COUNT(role_id) mtotal FROM sys_role_menu GROUP BY role_id) lt_rm on lt_rm.role_id = sr.kid
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="role_name != null">
+                AND sr.role_name LIKE CONCAT('%',#{role_name},'%')
+            </if>
+        </trim>
+        <choose>
+            <when test="order != null and column != null">
+                ORDER BY ${column} ${order}
+            </when>
+            <otherwise>
+                ORDER BY sr.role_name
+            </otherwise>
+        </choose>
+        LIMIT #{section},#{pageSize}
+    </select>
+
+    <!-- 角色列表的总条数总记录数 -->
+    <select id="listTotal" parameterType="HashMap" resultType="Integer">
+        SELECT COUNT(sr.kid) total FROM sys_role sr
+        LEFT JOIN (SELECT COUNT(role_id) utotal,role_id FROM sys_user_role GROUP BY role_id) l_tb ON l_tb.role_id = sr.kid
+        LEFT JOIN (SELECT role_id,COUNT(role_id) mtotal FROM sys_role_menu GROUP BY role_id) lt_rm on lt_rm.role_id = sr.kid
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="role_name != null">
+                AND sr.role_name LIKE CONCAT('%',#{role_name},'%')
+            </if>
+        </trim>
+    </select>
+
+    <!-- 删除角色 -->
+    <update id="delBatchRoles" parameterType="ArrayList">
+        delete from sys_role where kid in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 删除角色菜单 -->
+    <update id="delBatchRoleMenu" parameterType="ArrayList">
+        delete from sys_role_menu where role_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 清空角色菜单 -->
+    <update id="delEmptyMenu" parameterType="String">
+        delete from sys_role_menu where role_id = #{roleId}
+    </update>
+
+    <!-- 根据指定roleId的获取菜单,用于ztree的菜单分配 -->
+    <select id="getRoleMenu" resultType="HashMap" parameterType="String">
+        select sm.kid,sm.pid,sm.name,IF(lt.menu_id is not null,'true','false') checked from sys_menu sm
+        left join (select menu_id from sys_role_menu where role_id = #{roleId}) lt on lt.menu_id = sm.kid
+        order by sm.order_by ASC
+    </select>
+
+    <!-- 保存角色菜单 -->
+    <update id="saveRoleMenu">
+        INSERT INTO sys_role_menu (kid,role_id,menu_id) VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.kid},#{item.role_id},#{item.menu_id})
+        </foreach>
+    </update>
+
+</mapper>

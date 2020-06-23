@@ -75,10 +75,8 @@ public final class PageFormData extends HashMap<String,Object>{
                         if(obj != null){
                             if(obj instanceof String){
                                 final String value = obj.toString().trim();
-                                if(value.length() <= 0)continue;
-                                if(value.length() == 1 && value.equals("_"))continue;
-                                if(value.equalsIgnoreCase("undefined"))continue;
-                                if(value.equalsIgnoreCase("null"))continue;
+                                if(checkNull(value))
+                                    continue;
                                 map.put(key,value);
                             }else{
                                 map.put(key,obj);
@@ -110,10 +108,8 @@ public final class PageFormData extends HashMap<String,Object>{
                         if(obj != null){
                             if(obj instanceof String){
                                 final String value = obj.toString().trim();
-                                if(value.length() <= 0)continue;
-                                if(value.length() == 1 && value.equals("_"))continue;
-                                if(value.equalsIgnoreCase("undefined"))continue;
-                                if(value.equalsIgnoreCase("null"))continue;
+                                if(checkNull(value))
+                                    continue;
                                 json.put(key,value);
                             }else {
                                 json.put(key,obj);
@@ -149,10 +145,8 @@ public final class PageFormData extends HashMap<String,Object>{
                         if(obj != null){
                             if(obj instanceof String){
                                 final String value = obj.toString().trim();
-                                if(value.length() <= 0)continue;
-                                if(value.length() == 1 && value.equals("_"))continue;
-                                if(value.equalsIgnoreCase("undefined"))continue;
-                                if(value.equalsIgnoreCase("null"))continue;
+                                if(checkNull(value))
+                                    continue;
                                 objectObject.put(key,value);
                             }else{
                                 objectObject.put(key,obj);
@@ -164,6 +158,18 @@ public final class PageFormData extends HashMap<String,Object>{
             }
         } catch (Exception e){}
         return jsonArray;
+    }
+
+    private boolean checkNull(final String value){
+        if(value.length() <= 0)
+            return true;
+        if(value.length() == 1 && value.equals("_"))
+            return true;
+        if(value.equalsIgnoreCase("undefined"))
+            return true;
+        if(value.equalsIgnoreCase("null"))
+            return true;
+        return false;
     }
 
     public final static Map<String, String> build(final ServletRequest request){

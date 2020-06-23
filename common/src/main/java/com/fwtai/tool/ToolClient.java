@@ -859,6 +859,10 @@ public final class ToolClient implements Serializable{
             if(value != null && value.length() >0){
                 if(value.length() == 1 && value.equals("_"))
                     continue;
+                if(value.equalsIgnoreCase("undefined"))
+                    continue;
+                if(value.equalsIgnoreCase("null"))
+                    continue;
                 params.put(key,value.trim());
             }
         }
@@ -882,6 +886,10 @@ public final class ToolClient implements Serializable{
             if(value != null && value.length() > 0){
                 if(value.length() == 1 && value.equals("_"))
                     continue;
+                if(value.equalsIgnoreCase("undefined"))
+                    continue;
+                if(value.equalsIgnoreCase("null"))
+                    continue;
                 params.put(key,value.trim());
             }
         }
@@ -904,6 +912,10 @@ public final class ToolClient implements Serializable{
             final String value = request.getParameter(key);
             if(value != null && value.length() > 0){
                 if(value.length() == 1 && value.equals("_"))
+                    continue;
+                if(value.equalsIgnoreCase("undefined"))
+                    continue;
+                if(value.equalsIgnoreCase("null"))
                     continue;
                 params.put(key,value.trim());
             }

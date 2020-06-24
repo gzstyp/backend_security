@@ -145,7 +145,7 @@ public class MenuService{
             }
             pageFormData.remove("icon_style");
         }
-        if(pid.equals(ConfigFile.pid)){
+        if(ConfigFile.pid.equals(pid)){
             final String icon_style = pageFormData.getString("icon_style");
             if(icon_style == null){
                 return ToolClient.createJsonFail("请输入菜单图标");

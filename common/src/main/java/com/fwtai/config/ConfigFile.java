@@ -58,7 +58,7 @@ public final class ConfigFile implements Serializable{
 	/**账号或密码不正确*/
 	public final static int code206 = 206;
 	/**账号或密码不正确*/
-	public final static String msg206 = "账号或密码不正确";
+	public final static String msg206 = "账号或密码错误";
 	/**非法操作!或你的账号已被删除|你的账号已被禁用,一般用于被迫强制退出登录*/
 	public final static int code207 = 207;
 	/**没有操作权限*/

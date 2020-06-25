@@ -30,47 +30,47 @@ public class MenuController{
 
     /**添加*/
     @PreAuthorize("hasAuthority('menu:btn:add')")
-    @PostMapping(value = "/add",name = "menu:btn:add")
+    @PostMapping("/add")
     public void add(final HttpServletRequest request,final HttpServletResponse response){
         ToolClient.responseJson(menuService.add(ToolClient.getFormData(request)),response);
     }
 
     /**编辑*/
     @PreAuthorize("hasAuthority('menu:row:edit')")
-    @PostMapping(value = "/edit",name = "menu:row:edit")
+    @PostMapping("/edit")
     public void edit(final HttpServletRequest request,final HttpServletResponse response){
         ToolClient.responseJson(menuService.edit(ToolClient.getFormData(request)),response);
     }
 
     /**删除-单行*/
     @PreAuthorize("hasAuthority('menu:row:delById')")
-    @PostMapping(value = "/delById",name = "menu:row:delById")
+    @PostMapping("/delById")
     public void delById(final HttpServletRequest request,final HttpServletResponse response){
         ToolClient.responseJson(menuService.delById(ToolClient.getFormData(request)),response);
     }
 
     /**获取数据*/
     @PreAuthorize("hasAuthority('menu:btn:listData')")
-    @GetMapping(value = "/listData",name = "menu:btn:listData")
+    @GetMapping("/listData")
     public void listData(final HttpServletRequest request,final HttpServletResponse response){
         ToolClient.responseJson(menuService.listData(ToolClient.getFormData(request)),response);
     }
 
     /**获取详细信息*/
     @PreAuthorize("hasAuthority('menu:row:queryById')")
-    @GetMapping(value = "/queryById",name = "menu:row:queryById")
+    @GetMapping("/queryById")
     public void queryById(final HttpServletRequest request,final HttpServletResponse response){
         ToolClient.responseJson(menuService.queryById(ToolClient.getFormData(request)),response);
     }
 
     /**查询所有的菜单,用于添加或编辑菜单*/
     @PreAuthorize("hasAuthority('menu:btn:queryTreeMenu')")
-    @GetMapping(value = "/queryTreeMenu",name = "menu:btn:queryTreeMenu")
+    @GetMapping("/queryTreeMenu")
     public void queryTreeMenu(final HttpServletRequest request,final HttpServletResponse response){
         ToolClient.responseJson(menuService.queryTreeMenu(ToolClient.getFormData(request)),response);
     }
 
-    @GetMapping(value = "/notAuthorized",name = "menu:notAuthorized")
+    @GetMapping("/notAuthorized")
     public void notAuthorized(final HttpServletResponse response){
         ToolClient.responseJson(ToolClient.notAuthorized(),response);
     }

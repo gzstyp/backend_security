@@ -1,5 +1,6 @@
 package com.fwtai.auth;
 
+import com.fwtai.entity.User;
 import com.fwtai.service.web.UserService;
 import com.fwtai.tool.ToolClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,25 @@ public class LoginAuthFilter extends UsernamePasswordAuthenticationFilter{
             return this.getAuthenticationManager().authenticate(authRequest);
         }else{
             //在此处理锁定功能!!!
+            final User user = userService.queryUser(username);
+            if(user != null){
+                final Integer errorCount = user.getErrorCount() + 1;
+                if(errorCount < 4){
+                    userService.updateErrors(username);
+                }
+                final Long error = user.getError();
+                if(error < 0){
+                    final String json = "当前帐号或密码连续错误3次<br/>已被系统临时锁定<br/>请在"+user.getErrorTime()+"后重新登录";
+                    ToolClient.responseJson(ToolClient.createJsonFail(json),response);
+                    return null;
+                }
+                if (errorCount >= 3){
+                    userService.updateLoginTime(username);//当错误3次时更新错误的时刻就锁定
+                    final String json = "当前帐号或密码连续错误3次<br/>已被系统临时锁定,请30分钟后重试";
+                    ToolClient.responseJson(ToolClient.createJsonFail(json),response);
+                    return null;
+                }
+            }
             ToolClient.responseJson(ToolClient.invalidUserInfo(),response);
             return null;
             //return this.getAuthenticationManager().authenticate(null);//不能用这个，否则报错 NullPointerException

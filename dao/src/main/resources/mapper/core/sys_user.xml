@@ -30,7 +30,6 @@
         select menu_id from sys_user_menu where user_id = #{userId}) ltb,sys_menu sm where sm.kid = ltb.menu_id
     </select>
 
-
     <select id="queryUser" resultType="User" parameterType="String">
         SELECT error_count,DATE_FORMAT(error_time,'%Y-%m-%d %H:%i:%S') error_time,(NOW() - error_time) error FROM view_user_login WHERE user_name = #{userName} LIMIT 1
     </select>
@@ -38,25 +37,25 @@
     <update id="updateErrors" parameterType="String">
 		UPDATE sys_user SET error_count = error_count + 1 WHERE user_name = #{userName} LIMIT 1
 	</update>
-    <!-- 登录-更新错误时刻 -->
+    <!-- 登录-更新错误时刻-通过用户名 -->
     <update id="updateLoginTime" parameterType="String">
 		UPDATE sys_user SET error_time = DATE_ADD(NOW(),INTERVAL 30 MINUTE) WHERE user_name = #{userName} LIMIT 1
 	</update>
-    <!-- 登录-最后登录时间 -->
-    <update id="updatelogintime" parameterType="String">
-		UPDATE sys_user SET logintime = NOW() WHERE kid = #{userId} LIMIT 1
+    <!-- 登录-最后登录时间-通过userId -->
+    <update id="updateSucceedTime" parameterType="String">
+		UPDATE sys_user SET logintime = NOW() WHERE user_name = #{username} LIMIT 1
 	</update>
     <!-- 登录-更新登录次数 -->
     <update id="updateTimes" parameterType="String">
-		UPDATE sys_user SET times = times + 1 WHERE kid = #{userId} LIMIT 1
+		UPDATE sys_user SET times = times + 1 WHERE user_name = #{username} LIMIT 1
 	</update>
     <!-- 登录-登录成功把时间设置为当前默认时间 -->
     <update id="updateErrorTime" parameterType="String">
-		UPDATE sys_user SET error_time = NOW() WHERE kid = #{userId} LIMIT 1
+		UPDATE sys_user SET error_time = NOW() WHERE user_name = #{username} LIMIT 1
 	</update>
     <!-- 登录-登录结束:登录成功把登录错误次数更改为0 -->
     <update id="updateErrorCount" parameterType="String">
-		UPDATE sys_user SET error_count = 0  WHERE kid = #{userId} LIMIT 1
+		UPDATE sys_user SET error_count = 0  WHERE user_name = #{username} LIMIT 1
 	</update>
 
     <!-- 查询是否存在 -->
@@ -136,7 +135,7 @@
         </foreach>
     </update>
 
-    <!--获取登录者的权限 -->
+    <!--获取登录者的权限(暂时用不到) -->
     <select id="getPermission" resultType="String" parameterType="String">
         select permission from (
         select sur.user_id,sm.permission from sys_user_role sur
@@ -147,7 +146,7 @@
         left join sys_menu sm on sm.kid = sum.menu_id) tb where user_id = #{userId}
     </select>
 
-    <!--获取登录者的角色 -->
+    <!--获取登录者的角色(暂时用不到) -->
     <select id="getRole" resultType="String" parameterType="String">
         select sr.role_flag from sys_user_role sur
         left join sys_role sr on sr.kid = sur.role_id

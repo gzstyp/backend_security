@@ -7,7 +7,6 @@ import com.fwtai.config.ConfigFile;
 import com.fwtai.config.LocalUserId;
 import com.fwtai.dao.UserDao;
 import com.fwtai.entity.User;
-import com.fwtai.service.AsyncService;
 import com.fwtai.tool.ToolClient;
 import com.fwtai.tool.ToolJWT;
 import com.fwtai.tool.ToolString;
@@ -40,12 +39,6 @@ public class UserService{
 
     @Autowired
     private Passworder passworder;
-
-    @Resource
-    private MenuService menuService;
-
-    @Resource
-    private AsyncService asyncService;
 
     // 仅仅获取用户userId的角色和权限
     public List<String> getRolePermissions(final String userId){
@@ -126,14 +119,6 @@ public class UserService{
     public String getAllotRole(final PageFormData pageFormData){
         final String userId = pageFormData.getString("userId");
         return ToolClient.queryJson(userDao.getAllotRole(userId));
-    }
-
-    public List<String> getPermissions(final String userId){
-        return userDao.getPermissions(userId);
-    }
-
-    public List<String> getRoles(final String userId){
-        return userDao.getRoles(userId);
     }
 
     public User queryUser(final String userName){

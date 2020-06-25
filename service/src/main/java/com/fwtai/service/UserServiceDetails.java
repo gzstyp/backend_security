@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,9 @@ public class UserServiceDetails implements UserDetailsService{
     @Autowired
     private UserService userService;
 
+    @Resource
+    private AsyncService asyncService;
+
     /**
      * 通过账号查找用户信息,用于登录
      * @param username
@@ -33,8 +37,12 @@ public class UserServiceDetails implements UserDetailsService{
         final SysUser user = userService.getUserByUserName(username);
         if (user == null) {
             throw new UsernameNotFoundException("用户名或密码错误");
-        }else {
-            return new JwtUser(user.getKid(),user.getUserName(),user.getUserPassword(),user.getEnabled());
+        }else {//处理锁定的问题
+            final Integer enabled = user.getEnabled();
+            if(enabled == 0){
+                asyncService.updateLogin(username);
+            }
+            return new JwtUser(user.getKid(),user.getUserName(),user.getUserPassword(),enabled);
         }
     }
     /*
@@ -60,7 +68,7 @@ public class UserServiceDetails implements UserDetailsService{
      */
 
     /**
-     * 通过userId查找用户的全部角色和权限的信息
+     * 通过userId动态获取用户的全部角色和权限的信息
      * @param
      * @作者 田应平
      * @QQ 444141300

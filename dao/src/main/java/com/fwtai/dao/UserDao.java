@@ -115,10 +115,6 @@ public class UserDao{
         return dao.queryForPage(pageFormData,"sys_user.listData","sys_user.listTotal");
     }
 
-    public List<HashMap<String,String>> queryPermissions(){
-        return dao.queryForListString("sys_auth_filter.getShiroFilter");
-    }
-
     public String queryLogin(final String username){
         return dao.queryForString("sys_user.login",username);
     }
@@ -152,14 +148,6 @@ public class UserDao{
 
     public User queryUser(final String userName){
         return dao.queryForEntity("sys_user.queryUser",userName);
-    }
-
-    public List<String> getPermissions(final String userId){
-        return dao.queryListString("sys_user.getPermission",userId);
-    }
-
-    public List<String> getRoles(final String userId){
-        return dao.queryListString("sys_user.getRole",userId);
     }
 
     public void updateErrors(final String userName){

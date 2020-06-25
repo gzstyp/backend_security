@@ -93,9 +93,9 @@ public class RequestFilter extends OncePerRequestFilter {
                     if (validata){
                         // 将用户信息存入 authentication，方便后续校验,这个方法是要保存角色权限信息的
                         final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-                        //authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        // 将 authentication 存入 ThreadLocal，方便后续获取用户信息
-                        context.setAuthentication(authentication);
+                        //authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));//用于限流或黑名单处理???
+                        // todo 将 authentication 存入 redis ，方便后续获取用户信息
+                        context.setAuthentication(authentication);//存放权限信息,否则会提示‘没有操作权限’
                     }
                 }
             } catch (final Exception exception){

@@ -15,11 +15,11 @@ public final class ConfigFile implements Serializable{
 
     public final static String URL_LOGIN_PAGE = "/login.html";//登录页面
 
-    public final static String URL_REGISTER = "/user/register";//放行对外提供注册接口url
+    public final static String URL_REGISTER = "/api/v1.0/user/register";//放行对外提供注册接口url
 
     public final static String URL_PROCESSING = "/login";//登录认证接口,security默认的接口
 
-    public final static String[] IGNORE_URLS = {"/","/error",URL_LOGIN_PAGE,URL_REGISTER,"/user/renewalToken","/**/notAuthorized","/user/logout","/css/**","/images/**","/webjars/**","/swagger/**","/v2/api-docs","/swagger-ui.html","/swagger-resources/**"};
+    public final static String[] IGNORE_URLS = {"/","/error",URL_LOGIN_PAGE,URL_REGISTER,"/user/renewalToken","/**/notAuthorized","/user/logout","/webjars/**","/swagger-ui.html","/v2/api-docs","/swagge**","/api/v1.0/**","/**.ico","/swagger-resources","/swagger-resources/**"};
 
     public final static String ACCESS_TOKEN = "access_token";
 

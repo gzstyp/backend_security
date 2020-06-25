@@ -1,5 +1,6 @@
 package com.fwtai.auth;
 
+import com.fwtai.config.ConfigFile;
 import com.fwtai.entity.User;
 import com.fwtai.service.web.UserService;
 import com.fwtai.tool.ToolClient;
@@ -49,14 +50,14 @@ public class LoginAuthFilter extends UsernamePasswordAuthenticationFilter{
                 }
                 final Long error = user.getError();
                 if(error < 0){
-                    final String json = "当前帐号或密码连续错误3次<br/>已被系统临时锁定<br/>请在"+user.getErrorTime()+"后重新登录";
-                    ToolClient.responseJson(ToolClient.createJsonFail(json),response);
+                    final String msg = "当前帐号或密码连续错误3次!<br/>已被系统临时锁定……<br/>请在"+user.getErrorTime()+"后再重试";
+                    ToolClient.responseJson(ToolClient.createJson(ConfigFile.code198,msg),response);
                     return null;
                 }
                 if (errorCount >= 3){
                     userService.updateLoginTime(username);//当错误3次时更新错误的时刻就锁定
-                    final String json = "当前帐号或密码连续错误3次<br/>已被系统临时锁定,请30分钟后重试";
-                    ToolClient.responseJson(ToolClient.createJsonFail(json),response);
+                    final String msg = "当前帐号或密码连续错误3次<br/>已被系统临时锁定,请30分钟后重试";
+                    ToolClient.responseJson(ToolClient.createJson(ConfigFile.code198,msg),response);
                     return null;
                 }
             }

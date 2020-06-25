@@ -8,6 +8,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -62,6 +63,11 @@ public class ExceptionMonitor{
     @ExceptionHandler({MalformedJwtException.class})
     public void jwtException(final HttpServletResponse response){
         ToolClient.responseJson(ToolClient.createJson(199,"登录信息已过期,请重新登录"),response);
+    }
+
+    @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+    public void credentialsNotFoundException(final HttpServletResponse response){
+        ToolClient.responseJson(ToolClient.createJson(401,"没有访问权限"),response);
     }
 
     @ExceptionHandler(NullPointerException.class)

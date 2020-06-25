@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 
 /**
- * 登录认证过滤器,在此处理锁定功能!!!
+ * 登录认证过滤器,在此处理锁定功能!!!,优先于 UserDetailsService.loadUserByUsername(userName);
 */
 public class LoginAuthFilter extends UsernamePasswordAuthenticationFilter{
 

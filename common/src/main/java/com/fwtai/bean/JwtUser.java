@@ -41,10 +41,9 @@ public class JwtUser implements UserDetails{
     /**
      * 含有角色和权限,用于token认证通过后获取全部的角色和权限
     */
-    public JwtUser(final String userId,final String username,final String password,final Integer enabled,final Collection<? extends GrantedAuthority> authorities) {
+    public JwtUser(final String userId,final String username,final Integer enabled,final Collection<? extends GrantedAuthority> authorities) {
         this.userId = userId;
         this.username = username;
-        this.password = password;
         this.enabled = (enabled == 0);//0正常;1禁用
         this.authorities = authorities;
     }

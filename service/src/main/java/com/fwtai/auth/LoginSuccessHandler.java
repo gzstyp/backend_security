@@ -47,8 +47,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
         map.put("menuData",menuService.getMenuData(userId));
         map.put("userName",jwtUser.getUsername());
         final String json = ToolClient.queryJson(map);
-        response.addHeader(ConfigFile.REFRESH_TOKEN,refresh_token);
-        response.addHeader(ConfigFile.ACCESS_TOKEN,access_token);
+        //response.addHeader(ConfigFile.REFRESH_TOKEN,refresh_token);
+        //response.addHeader(ConfigFile.ACCESS_TOKEN,access_token);
         ToolClient.responseJson(json,response);
     }
 }

@@ -88,7 +88,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(HttpMethod.POST,ConfigFile.URL_REGISTER).permitAll().anyRequest().authenticated();//注意还有请求方式,不走动态加载权限的处理
 
         //第4步：拦截账号、密码。覆盖 UsernamePasswordAuthenticationFilter过滤器
-        http.addFilterAt(myUsernamePasswordAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(authenticationFilter(),UsernamePasswordAuthenticationFilter.class);
 
         //第5步：拦截token，并检测。在 UsernamePasswordAuthenticationFilter 之前添加 JwtAuthenticationTokenFilter
         http.addFilterBefore(requestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -110,7 +110,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
      * @throws Exception
      */
     @Bean
-    public LoginAuthFilter myUsernamePasswordAuthenticationFilter() throws Exception {
+    public LoginAuthFilter authenticationFilter() throws Exception {
         final LoginAuthFilter filter = new LoginAuthFilter();
         //成功后处理
         filter.setAuthenticationSuccessHandler(loginSuccessHandler);

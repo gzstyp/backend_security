@@ -15,6 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsUtils;
 
+import javax.annotation.Resource;
+
 /**
  * Security授权配置主文件
 */
@@ -23,39 +25,39 @@ import org.springframework.web.cors.CorsUtils;
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     //若出错则用上面的方式注解,这个也是可以的
-    @Autowired
+    @Resource
     private UserServiceDetails userDetailsService;
 
     //token拦截器(最先请求的拦截器)
-    @Autowired
+    @Resource
     private RequestFilter requestFilter;
 
     //身份校验失败处理器
-    @Autowired
+    @Resource
     private AuthenticationPointHandler authenticationPointHandler;
 
     //权限校验拒绝处理器(拒绝访问)
-    @Autowired
+    @Resource
     private AccessDeniedService accessDeniedService;
 
     //登录成功处理器
-    @Autowired
+    @Resource
     private LoginSuccessHandler loginSuccessHandler;
 
     //登录失败操作
-    @Autowired
+    @Resource
     private LoginFailureHandler loginFailureHandler;
 
     //退出处理器
-    @Autowired
+    @Resource
     private LogoutService logoutService;
 
     //注销成功退出处理器
-    @Autowired
+    @Resource
     private LogoutSuccessService logoutSuccessService;
 
     //密码校验器
-    @Autowired
+    @Resource
     private Passworder passworder;
 
     /**

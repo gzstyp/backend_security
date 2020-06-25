@@ -1021,7 +1021,7 @@ public final class ToolClient implements Serializable{
     }
 
     /**
-     * 账号或密码不正确
+     * 账号或密码错误
      * @作者 田应平
      * @QQ 444141300
      * @创建时间 2020/5/1 0:16

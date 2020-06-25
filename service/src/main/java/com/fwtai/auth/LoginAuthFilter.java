@@ -3,6 +3,7 @@ package com.fwtai.auth;
 import com.fwtai.config.ConfigFile;
 import com.fwtai.entity.User;
 import com.fwtai.service.web.UserService;
+import com.fwtai.tool.ToolAttack;
 import com.fwtai.tool.ToolClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,9 @@ public class LoginAuthFilter extends UsernamePasswordAuthenticationFilter{
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ToolAttack toolAttack;
+
     @Override
     public Authentication attemptAuthentication(final HttpServletRequest request,final HttpServletResponse response) throws AuthenticationException{
         final HashMap<String,String> params = ToolClient.getFormParams(request);
@@ -35,12 +39,27 @@ public class LoginAuthFilter extends UsernamePasswordAuthenticationFilter{
         }
         final String username = params.get(p_username);
         final String password = params.get(p_password);
+        final String ip = request.getRemoteAddr();
+        final boolean blocked = toolAttack.isBlocked(ip);
+        if(blocked){
+            final String msg = "帐号或密码错误次数过多,IP<br/>"+ip+"<br/>已被系统屏蔽,请30分钟后重试!";
+            ToolClient.responseJson(ToolClient.createJson(ConfigFile.code198,msg),response);
+            return null;
+        }
         if(userService.checkLogin(username,password)){
+            toolAttack.loginSucceed(ip);
             //将账号、密码装入UsernamePasswordAuthenticationToken中,即这个方法是没有角色或权限,只是单纯的保存用户名和密码
             final UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username,password);// 这个方法是没有角色或权限
             setDetails(request,authRequest);
             return this.getAuthenticationManager().authenticate(authRequest);
         }else{
+            toolAttack.loginFailed(ip);
+            /*final boolean bl = toolAttack.getCount(ip) > 4;
+            if(blocked || bl){
+                final String msg = "帐号或密码错误次数过多,IP<br/>"+ip+"<br/>已被系统屏蔽,请30分钟后重试!";
+                ToolClient.responseJson(ToolClient.createJson(ConfigFile.code198,msg),response);
+                return null;
+            }*/
             //在此处理锁定功能!!!
             final User user = userService.queryUser(username);
             if(user != null){

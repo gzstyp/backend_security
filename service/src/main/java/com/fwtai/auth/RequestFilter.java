@@ -37,7 +37,7 @@ public class RequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request,final HttpServletResponse response,final FilterChain chain) throws ServletException, IOException {
-        final String uri = request.getRequestURI();
+        /*final String uri = request.getRequestURI();
         System.out.println("请求的uri-->"+uri);
         final String[] urls = ConfigFile.IGNORE_URLS;
         for(int x = 0; x < urls.length; x++){
@@ -47,7 +47,7 @@ public class RequestFilter extends OncePerRequestFilter {
                 chain.doFilter(request,response);
                 return;
             }
-        }
+        }*/
         final String refresh_token = ToolString.wipeString(request.getHeader(ConfigFile.REFRESH_TOKEN));
         final String access_token = ToolString.wipeString(request.getHeader(ConfigFile.ACCESS_TOKEN));
         final String url_refresh_token = ToolString.wipeString(request.getParameter(ConfigFile.REFRESH_TOKEN));

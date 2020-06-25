@@ -60,6 +60,7 @@ public class UserServiceDetails implements UserDetailsService{
             for (final String role : roles){
                 authorities.add(new SimpleGrantedAuthority(role));
             }
+            // todo 将 userId 把 authentication 存入 redis ，方便后续获取用户信息
             return new JwtUser(user.getKid(),user.getUserName(),user.getEnabled(),authorities);
         }
         throw new RuntimeException("账号信息不存在");

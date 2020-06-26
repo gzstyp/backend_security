@@ -1,15 +1,23 @@
 package com.fwtai.api.controller;
 
+import com.fwtai.bean.PageFormData;
+import com.fwtai.service.web.UserService;
 import com.fwtai.tool.ToolClient;
+import com.fwtai.tool.ToolJWT;
+import io.jsonwebtoken.JwtException;
 import io.swagger.annotations.Api;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
 /**
- * app端用户中心
+ * app端用户中心,list或查询详细信息时，不需要token的,而添加、编辑、删除时需要登录
  * @作者 田应平
  * @版本 v1.0
  * @创建时间 2020-03-24 12:36
@@ -21,6 +29,26 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/v1.0/user")
 public class UserController{
+
+    @Resource
+    private ToolJWT toolJWT;
+
+    @Resource
+    private UserService userService;
+
+    /*更新token*/
+    @PostMapping("/renewalToken")
+    public void renewalToken(final HttpServletRequest request,final HttpServletResponse response){
+        final PageFormData formData = ToolClient.getFormData(request);
+        final String access_token = formData.getString("access_token");
+        try {
+            final String userId = toolJWT.extractUserId(access_token);
+            final HashMap<String,String> result = userService.buildToken(userId);
+            ToolClient.responseJson(ToolClient.queryJson(result),response);
+        } catch (final JwtException exception){
+            ToolClient.responseJson(ToolClient.tokenInvalid(),response);
+        }
+    }
 
     /*Post请求 保存用户信息*/
    /*@ApiOperation(value = "post请求 保存用户信息", notes = "输入录用户（手机号码）和密码")
@@ -47,5 +75,12 @@ public class UserController{
     @PostMapping(value = "/register")
     public void register(final HttpServletResponse response){
         ToolClient.responseJson(ToolClient.createJsonSuccess("不携带token使用post访问register成功"),response);
+    }
+
+    /**编辑*/
+    @PreAuthorize("hasAuthority('role:row:edit')")
+    @PostMapping("/edit")
+    public void edit(final HttpServletRequest request,final HttpServletResponse response){
+        ToolClient.responseJson(ToolClient.createJsonSuccess("需要token才能访问edit成功"),response);
     }
 }

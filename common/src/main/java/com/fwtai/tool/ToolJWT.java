@@ -53,9 +53,8 @@ public class ToolJWT implements Serializable{
             final byte[] keyBytes = (new BASE64Decoder()).decodeBuffer(publicKey);
             final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
             final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            final PublicKey publicKey = keyFactory.generatePublic(keySpec);
-            return publicKey;
-        } catch (Exception e) {
+            return keyFactory.generatePublic(keySpec);
+        } catch (Exception e){
             e.printStackTrace();
         }
         return null;
@@ -66,8 +65,7 @@ public class ToolJWT implements Serializable{
             final byte[] keyBytes = (new BASE64Decoder()).decodeBuffer(privateKey);
             final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
             final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            final PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-            return privateKey;
+            return keyFactory.generatePrivate(keySpec);
         } catch (Exception e) {
             e.printStackTrace();
         }

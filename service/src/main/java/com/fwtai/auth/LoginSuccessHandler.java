@@ -5,7 +5,6 @@ import com.fwtai.config.ConfigFile;
 import com.fwtai.service.web.MenuService;
 import com.fwtai.tool.ToolClient;
 import com.fwtai.tool.ToolJWT;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -25,7 +24,7 @@ import java.util.Map;
 @Component
 public class LoginSuccessHandler implements AuthenticationSuccessHandler{
 
-    @Autowired
+    @Resource
     private ToolJWT toolToken;
 
     @Resource

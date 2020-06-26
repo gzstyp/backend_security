@@ -4,7 +4,6 @@ import com.fwtai.bean.PageFormData;
 import com.fwtai.service.web.UserService;
 import com.fwtai.tool.ToolClient;
 import com.fwtai.tool.ToolJWT;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +15,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * 用户管理接口入口
@@ -48,9 +46,7 @@ public class UserController{
         final PageFormData formData = ToolClient.getFormData(request);
         final String access_token = formData.getString("access_token");
         try {
-            final Claims claims = toolJWT.parser(access_token);
-            final String userId = claims.getId();
-            final List<String> permissionRole = claims.get(userId,List.class);
+            final String userId = toolJWT.extractUserId(access_token);
             final HashMap<String,String> result = userService.buildToken(userId);
             ToolClient.responseJson(ToolClient.queryJson(result),response);
         } catch (final JwtException exception){

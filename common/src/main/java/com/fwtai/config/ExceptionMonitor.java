@@ -52,22 +52,22 @@ public class ExceptionMonitor{
 
     @ExceptionHandler({SecurityException.class})
     public void signatureException(final HttpServletResponse response){
-        ToolClient.responseJson(ToolClient.createJson(199,"无效的token,请重新登录"),response);
+        ToolClient.responseJson(ToolClient.tokenInvalid("无效的token,请重新登录"),response);
     }
 
     @ExceptionHandler({ExpiredJwtException.class})
     public void expiredJwtException(final HttpServletResponse response){
-        ToolClient.responseJson(ToolClient.createJson(199,"未登录或登录已过期,请重新登录"),response);
+        ToolClient.responseJson(ToolClient.tokenInvalid(),response);
     }
 
     @ExceptionHandler({MalformedJwtException.class})
     public void jwtException(final HttpServletResponse response){
-        ToolClient.responseJson(ToolClient.createJson(199,"登录信息已过期,请重新登录"),response);
+        ToolClient.responseJson(ToolClient.tokenInvalid(),response);
     }
 
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
     public void credentialsNotFoundException(final HttpServletResponse response){
-        ToolClient.responseJson(ToolClient.createJson(401,"没有访问权限"),response);
+        ToolClient.responseJson(ToolClient.tokenInvalid(),response);
     }
 
     @ExceptionHandler(NullPointerException.class)

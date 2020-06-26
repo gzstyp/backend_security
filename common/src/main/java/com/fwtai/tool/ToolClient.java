@@ -1013,10 +1013,10 @@ public final class ToolClient implements Serializable{
         return json.toJSONString();
     }
 
-    public final static String loginTimeout(){
+    public final static String tokenInvalid(final String msg){
         final JSONObject json = new JSONObject();
         json.put(ConfigFile.code,ConfigFile.code205);
-        json.put(ConfigFile.msg,ConfigFile.msg205);
+        json.put(ConfigFile.msg,msg);
         return json.toJSONString();
     }
 
